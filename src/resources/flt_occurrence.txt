@@ -1,0 +1,11 @@
+1       Flight 1
+1       Flight 2
+3       Flight 3
+5       Flight 4
+9       Flight 5
+24      Flight 6
+56      Flight 7
+128     Flight 8
+900     Flight 9
+2221    Flight 10
+

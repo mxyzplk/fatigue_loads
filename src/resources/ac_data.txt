@@ -1,0 +1,4 @@
+60000       number of flights
+85          mean flight time (min)
+15          blocks
+10          flights
