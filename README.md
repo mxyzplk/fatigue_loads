@@ -1,0 +1,1 @@
+This package compiles tools for fatigue loads analysis focusing on aircraft development.
