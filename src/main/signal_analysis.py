@@ -58,18 +58,20 @@ class Th:
                 load2.append(self.range[sorted_indices2[i]])
 
         fig, ax = plt.subplots()
-        ax.plot(exceedances1, load1)
-        ax.plot(exceedances2, load2)
+        ax.plot(exceedances1, load1, color='black')
+        ax.plot(exceedances2, load2, color='black')
         ax.set_xlabel('Exceedances')
         ax.set_ylabel(self.label)
         ax.set_title('Load Exceedances - ' + self.label)
+        ax.grid(color='0.8', linestyle='dashed', which='both', linewidth=0.5)
+        plt.figure(figsize=(10, 6))
 
         folder_name = "results"
         os.makedirs("results", exist_ok=True)
 
         filepath = os.path.join(folder_name, 'load_exc_' + str(self.label) + '.png')
 
-        fig.savefig(filepath, dpi=300, bbox_inches='tight')
+        fig.savefig(filepath, dpi=600, bbox_inches='tight')
 
 
     def spectra_range(self):
@@ -85,17 +87,19 @@ class Th:
             load2.append(-1.0*float(self.range[sorted_indices[i]]))
 
         fig, ax = plt.subplots()
-        ax.plot(exceedances, load1)
-        ax.plot(exceedances, load2)
+        ax.plot(exceedances, load1, color='black')
+        ax.plot(exceedances, load2, color='black')
         ax.set_xlabel('Exceedances')
         ax.set_ylabel(self.label)
         ax.set_title('Amplitude Exceedances - ' + self.label)
+        ax.grid(color='0.8', linestyle='dashed', which='both', linewidth=0.5)
+        plt.figure(figsize=(10, 6))
 
         folder_name = "results"
         os.makedirs("results", exist_ok=True)
 
         filepath = os.path.join(folder_name, 'amplitude_exc_' + str(self.label) + '.png')
 
-        fig.savefig(filepath, dpi=300, bbox_inches='tight')
+        fig.savefig(filepath, dpi=600, bbox_inches='tight')
 
 
