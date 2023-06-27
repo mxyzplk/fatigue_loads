@@ -1,12 +1,3 @@
-import signal_analysis
-import numpy as np
-import math
+from flights import Flight
 
-time = np.empty(1000)
-th = np.empty(1000)
-
-for t in range(1000):
-    th[t] = 3 * math.sin(t) + math.exp(-2*t)
-
-Test = signal_analysis.Th("label", th)
-
+flight_array =  [Car("Brand", "Model", "Color") for _ in range(10)]
