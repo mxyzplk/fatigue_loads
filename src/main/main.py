@@ -1,3 +1,5 @@
-from flights import Flight
+from config import Config
 
-flight_array =  [Car("Brand", "Model", "Color") for _ in range(10)]
+wing_config = Config()
+wing_config.set_config()
+wing_config.write_load_cycles()

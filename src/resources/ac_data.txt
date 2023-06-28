@@ -4,3 +4,4 @@
 15          blocks
 4000        flights per block
 10          flights
+1           logs
