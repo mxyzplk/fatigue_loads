@@ -1,55 +1,41 @@
-import os
-from signal_analysis import Th
 import numpy as np
+import os
 
 class Flights:
-    def __init__(self, filepaths, labels, flight_types):
-        self.flight_data = [Flight(filepaths[i], labels[i]) for i in range(int(flight_types))]
-
-
-    def write_load_cycles(self, flts_per_block, block, logs):
+    def __init__(self, filepaths):
+        self.flight_data = [Flight(filepaths) for _ in range(len(filepaths))]
+        
+        
+    def write_load_cycles(self, flts_per_block, block, log, sel, comp,  label, load):
         
         folder_name = "results"
         os.makedirs("results", exist_ok=True)
 
-        filepath = os.path.join(folder_name, 'wing_fatigue_loads.txt')
+        filepath = os.path.join(folder_name, 'load_cycles_' + str(comp) + '_' + str(label) + '_' + str(load) + '.txt')
         
-        open(filepath, 'w').close()
-        
-        for i in range(flts_per_block):
-            if logs == 1:
-                print("Printing flight " + str(i+1) + " of 4000. Flight: " + str(block[i]))
-            flt = int(block[i])-1
-            self.flight_data[flt].write_flights(filepath)
+        for i in range(int(flts_per_block)):
             
-                        
-    def flights_to_th(self, flts_per_block, block, label, comp):
-        
-        th = []
-        updated_th = th
-        
-        for i in range(flts_per_block):
-            th = updated_th
-            flt = int(block[i])-1
-            updated_th = self.flight_data[flt].write_th(th, int(comp))
-        
-        th = Th(label, updated_th)
-                    
+            if int(log) == 1:
+                print('Printing Flight #' + str(i) + " Type: " + int(block[i]))
             
+            self.flight_data[int(block[i])].write_flights(filepath, sel)
+
+
 class Flight:
-    def __init__(self, filepath, label):
+    def __init__(self, filepath):
         self.np = 0
+        self.npars = 0
+        
         self.filepath = filepath
-        self.label = label
+        self.component = None
         self.segments = []
         self.level = []
         self.cycles = []
-        self.ref = None
-        self.load = None
-        self.th = None
-        self.npars = 0
         self.pars = []
-        self.comp = None
+
+        self.load = None
+        self.cases = None
+        self.th = None
         
         self.read_flight()
 
@@ -62,55 +48,53 @@ class Flight:
                 if i == 1:
                     temp = line.split()
                     self.np = int(temp[0])
-                    self.comp = temp[1]
+                    self.component = temp[1]
                     self.npars = int(temp[2])
-                    self.load = np.empty(self.np, self.npars, 2) # number of lines, number of parameters, load 1 and load 2
-                    self.ref = np.chararray(self.np, self.npars, 2) # number of lines, number of parameters, load 1 and load 2
-                    self.th = np.empty(self.np * 2, self.npars)
                     
                     for j in range(self.npars):
-                        self.pars.append(temp[2+j])
-                        
+                        self.pars.append(temp[3+j])
+                    
+                    self.load = np.empty(self.np, self.npars, 2) # lines, parameters, maximum and minimum loads
+                    self.cases = np.empty(self.np, self.npars, 2) # lines, parameters, maximum and minimum loads
+                    self.th = np.empty(self.np * 2, self.npars)
+                    
                 if i > 1:
                     temp = line.split()
+                    
                     # basic information
                     self.segments.append(temp[0])
                     self.level.append(temp[1])
                     self.cycles.append(temp[2])
-
+                    
+                    # loads
                     for j in range(self.npars):
-                        self.load[i, j, 1] = temp[3 + 4 * j]
-                        self.load[i, j, 2] = temp[5 + 4 * j]
-                        self.ref[i, j, 1] = temp[4 + 4 * j]
-                        self.ref[i, j, 2] = temp[6 + 4 * j]                        
-                        self.th[2 * i, j] = temp[3 + 4 * j]
-                        self.th[2 * i - 1, j] = temp[5 + 4 * j]
+                        self.load[i, j, 0] = float(temp[3 + 4 * j])
+                        self.load[i, j, 1] = float(temp[5 + 4 * j])
+                        self.cases[i, j, 0] = temp[4 + 4 * j]
+                        self.cases[i, j, 1] = temp[6 + 4 * j]
+                        self.th[2 * i, j] = float(temp[3 + 4 * j])
+                        self.th[2 * i - 1, j] = float(temp[5 + 4 * j])                        
+
                     
-                    
-    def write_flights(self, filepath):
+    
+    # Data from fatigue and damage tolerance analysis                
+    def write_flights(self, filepath, sel):
         
-        # Appeding data to result file containing the combination of flights in a block
+        # Appending data to result file containing the combination of flights in a block
         file = open(filepath, 'a')
         
         for i in range(int(self.np)):
-            formatted_data = "{:8d}  {:12.3f}  {:8s}  {:12.3f}  {:8s}\n".format(int(self.cycles[i]), float(self.load1[i]), self.ref1[i], float(self.load2[i]), self.ref2[i])
+            
+            formatted_data = "{:8d}  {:12.3f}  {:8s}  {:12.3f}  {:8s}\n".format(int(self.cycles[i]), float(self.load[i, int(sel), 0]), self.cases[i, int(sel), 0], float(self.load2[i, int(sel), 1]), self.cases[i, int(sel), 2])
             file.write(formatted_data)
         
         file.close()
         
-        
-    def write_th(self, th, comp):
+    # Function that writes the time history from each flight into a time history comprising all blocks   
+    def write_th(self, th, sel):
         
         for i in range(int(self.np)):
-            th.append(self.th[2 * i], int(comp))
-            th.append(self.th[2 * i - 1], int(comp))
+            th.append(self.th[2 * i], int(sel))
+            th.append(self.th[2 * i - 1], int(sel))
             
         return th
-    
-    
-    def generate_sublists(lst):
-        it = iter(lst)
-        while True:
-            sublist = [next(it), next(it)]
-            yield sublist
-        
