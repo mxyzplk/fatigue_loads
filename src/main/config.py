@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from flights import Flight
-from signal_analysis import Th
+from component import Component
 
 
 class Config:
@@ -14,16 +13,21 @@ class Config:
         self.block = []
         self.nflights = 0
         self.resources_dir = None
-        self.main_dir = None
+        self.config_dir = None
+        self.flights_dir = None
+        self.statistics_dir = None
+        self.twist_dir = None
+        self.flt_path = []
         self.flight_types = 0
         self.flight_time = 0
         self.flight_range = 0
-        self.flight_data = None
         self.nblocks = 0
         self.flts_per_block = 0
         self.logs = 0
+        self.component = Component()
         
         self.set_config()
+        
 
     def get_dirs(self):
         # Get the current file's directory
@@ -31,15 +35,20 @@ class Config:
 
         # Construct the path to the resources folder
         self.resources_dir = os.path.join(self.main_dir, '../resources')
+        self.config_dir = os.path.join(self.resources_dir, '../config')
+        self.flights_dir = os.path.join(self.resources_dir, '../flights')
+        self.statistics_dir = os.path.join(self.resources_dir, '../statistics')
+        self.twist_dir = os.path.join(self.resources_dir, '../twist')        
+        
 
     def set_config(self):
 
         self.get_dirs()
 
         # Setting paths to various input files
-        flt_occ_path = os.path.join(self.resources_dir, 'flt_occurrence.txt')
-        config_path = os.path.join(self.resources_dir, 'ac_data.txt')
-        flt_disp_path = os.path.join(self.resources_dir, 'flt_distribution.txt')
+        flt_occ_path = os.path.join(self.config_dir, 'flt_occurrence.txt')
+        config_path = os.path.join(self.config_dir, 'ac_data.txt')
+        flt_disp_path = os.path.join(self.config_dir, 'flt_distribution.txt')
         
 
         # Reading config file
@@ -79,17 +88,14 @@ class Config:
 
         # Reading flight occurrences
         with open(flt_occ_path, 'r') as file:
-            file_path = []
             for i in range(int(self.flight_types)):
                 line = file.readline()
                 temp = line.split()
                 self.flight_occ.append(temp[0])
                 self.flight_filenames.append(temp[1])
                 self.flight_labels.append(temp[2])
-                file_path.append(os.path.join(self.resources_dir, self.flight_filenames[i]))
+                self.flt_path.append(os.path.join(self.flights_dir, self.flight_filenames[i]))
 
-        # Initializing Flight array
-        self.flight_data = [Flight(file_path[i], self.flight_labels[i]) for i in range(int(self.flight_types))]
         
         # Reading flights distribution in a block
         with open(flt_disp_path, 'r') as file:
@@ -97,34 +103,10 @@ class Config:
                 line = file.readline()
                 temp = line.split()                
                 self.block.append(temp[0])
-                
-                
-    def write_load_cycles(self):
-        
-        folder_name = "results"
-        os.makedirs("results", exist_ok=True)
 
-        filepath = os.path.join(folder_name, 'wing_fatigue_loads.txt')
-        
-        open(filepath, 'w').close()
-        
-        for i in range(self.flts_per_block):
-            if self.logs == 1:
-                print("Printing flight " + str(i+1) + " of 4000. Flight: " + str(self.block[i]))
-            flt = int(self.block[i])-1
-            self.flight_data[flt].write_flights(filepath)
+                
+                
+
             
-            
-    def flights_to_th(self):
-        
-        th = []
-        updated_th = th
-        
-        for i in range(self.flts_per_block):
-            th = updated_th
-            flt = int(self.block[i])-1
-            updated_th = self.flight_data[flt].write_th(th)
-        
-        th = Th("teste", updated_th)
-        
+
             

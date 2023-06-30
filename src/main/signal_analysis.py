@@ -17,11 +17,13 @@ class Th:
         self.calculate_rainflow()
         self.spectra_peaks()
         self.spectra_range()
+        
 
     def set_time_history(self, time_history):
         self.np = len(time_history)
         for i in range(self.np):
             self.time_history.append(time_history[i])
+            
 
     def calculate_rainflow(self):
         cycles_object = rainflow.extract_cycles(self.time_history)
@@ -33,6 +35,7 @@ class Th:
             self.peak1.append(float(mean) + float(range))
             self.peak2.append(float(mean) - float(range))
         self.reduced_time_history.append(i_end)
+        
 
     def spectra_peaks(self):
         sorted_indices1 = sorted(range(len(self.peak1)), key=lambda i: self.peak1[i], reverse=True)
