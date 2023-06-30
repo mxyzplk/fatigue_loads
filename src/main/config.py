@@ -35,10 +35,14 @@ class Config:
 
         # Construct the path to the resources folder
         self.resources_dir = os.path.join(self.main_dir, '../resources')
-        self.config_dir = os.path.join(self.resources_dir, '../config')
-        self.flights_dir = os.path.join(self.resources_dir, '../flights')
-        self.statistics_dir = os.path.join(self.resources_dir, '../statistics')
-        self.twist_dir = os.path.join(self.resources_dir, '../twist')        
+        self.config_dir = os.path.join(self.resources_dir, './config')
+        self.flights_dir = os.path.join(self.resources_dir, './flights')
+        self.statistics_dir = os.path.join(self.resources_dir, './statistics')
+        self.twist_dir = os.path.join(self.resources_dir, './twist')       
+        
+        print(self.main_dir)
+        print(self.resources_dir)
+        print(self.config_dir)
         
 
     def set_config(self):
