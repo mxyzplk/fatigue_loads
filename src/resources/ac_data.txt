@@ -1,7 +1,0 @@
-60000       number of flights
-85          mean flight time (min)
-281         mean flight range (nm)
-15          blocks
-4000        flights per block
-10          flights
-1           logs
