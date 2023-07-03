@@ -1,6 +1,6 @@
 #
 class Flight_statistics:
-    def __init__(self, filepath, times, life, flts, nms):
+    def __init__(self, filepath, times, life, nflts, nms):
         self.nsegs = 0
         self.segs = []
         self.idist = 0
@@ -10,10 +10,12 @@ class Flight_statistics:
         self.nps = 0
         self.itype = 0                        # 0: Statistics based on time 1: Statistics based on range
         self.vtype = 0                        # Base of the Statistics
+        self.life_time = float(life)
+        self.seg_time = None
         
-        self.read_cases(filepath)
+        self.read_cases(filepath, times)
     
-    def read_cases(self, filepath):
+    def read_cases(self, filepath, times):
         
         with open(self.filepath, 'r') as file:
             line = file.readline()
@@ -30,13 +32,15 @@ class Flight_statistics:
                 line = file.readline()
                 temp = line.split()
                 self.segs.append(float(temp[i]))
+                self.seg_time.append(times[temp[i]])
             ##############################################    # Distribution based on time or input
             line = file.readline()
             temp = line.split() 
             self.idists = int(temp[0])        
            
             if self.idists == 0:
-                pass
+                for i in range(len(self.segs)):
+                    self.dists.append(float(self.seg_time[i]) / self.life_time)
             else:
                 line = file.readline()
                 temp = line.split()                  
