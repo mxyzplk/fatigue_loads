@@ -1,3 +1,10 @@
+1    1      0|1: Time[hrs]|Range[nm]  -  Base
+6           Segments
+2  3  4  5  6  8
+1           Distribution based on 0: Time  1: Input
+0.2 0.2 0.1 0.15 0.15 0.2     
+1           Limitations per segment - 0: No  1: Yes
+1  1  1  1  1  0.683
 19          Maneuver LF Exceedances per NM
 0.100        6.8949E-02       -0.100       5.9106E-02
 0.150        2.4512E-02       -0.150       1.4952E-02

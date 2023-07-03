@@ -20,6 +20,7 @@ class Config:
         self.flt_path = []
         self.flight_types = 0
         self.flight_time = 0
+        self.airborne_time = 0        
         self.flight_range = 0
         self.nblocks = 0
         self.flts_per_block = 0
@@ -64,6 +65,10 @@ class Config:
             line = file.readline()
             temp = line.split()
             self.flight_time = int(temp[0])    # Flight time in minutes
+            
+            line = file.readline()
+            temp = line.split()
+            self.airborne_time = int(temp[0])  # Airborne time in minutes            
 
             line = file.readline()
             temp = line.split()
@@ -82,7 +87,7 @@ class Config:
 
             line = file.readline()
             temp = line.split()
-            self.flight_types = int(temp[0])   # flight Types
+            self.flight_types = int(temp[0])   # Flight Types
             
 
             line = file.readline()

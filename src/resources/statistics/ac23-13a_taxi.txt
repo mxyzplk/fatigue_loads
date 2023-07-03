@@ -1,3 +1,5 @@
+2           Segments
+0   9
 7      Taxi LF Exceedances per 1000 flts
 10        0.470     10        -0.470
 100       0.400     100       -0.400
