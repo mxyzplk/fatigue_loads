@@ -1,3 +1,4 @@
+2.93        Limit Maneuver Load Factor
 1    1      0|1: Time[hrs]|Range[nm]  -  Base
 6           Segments
 2  3  4  5  6  8

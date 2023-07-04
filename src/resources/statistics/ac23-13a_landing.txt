@@ -1,3 +1,4 @@
+10.0   Limit Sinking Speed
 16  Sinking Rate Exceedances per 10000 flights
 1        6.40
 1.5      6.00
