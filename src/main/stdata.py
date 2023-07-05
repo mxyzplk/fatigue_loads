@@ -1,5 +1,6 @@
-import numpty as np
+import numpy as np
 import math
+from scipy.interpolate import interp1d
 
 #
 #  Maneuver and Gust Statistic 
@@ -13,11 +14,11 @@ class Flight_statistics:
         self.ilimit = 0
         self.limits = []       
         self.nps = 0
-        self.itype = 0                        # 0: Statistics based on time 1: Statistics based on range
-        self.vtype = 0                        # Base of the Statistics
+        self.sfactor = 0                        # Base of the Statistics
         self.airborne_time = float(airborne_time)
-        self.seg_time = None
-        self.max = 0
+        self.seg_time = []
+        self.inclf = 0
+        self.meanlf = 0
         self.statistics = None
         self.levels = np.empty((10, 2))
         
@@ -28,52 +29,46 @@ class Flight_statistics:
     
     def read_cases(self, filepath, times, multiplier):
         
-        with open(self.filepath, 'r') as file:
+        with open(filepath, 'r') as file:
             line = file.readline()
             temp = line.split() 
-            self.max = float(temp[0])         # Maximum value (e.i. limit maneuvering load factor, limit gust, etc)
+            self.inclf = float(temp[0])           # Maximum value (e.i. limit maneuvering load factor, limit gust, etc)
+            self.meanlf = float(temp[1])
             
             line = file.readline()
-            temp = line.split() 
-            self.itype = int(temp[0])         # Statistics type
-            self.vtype = int(temp[1])         # Statistics base (like 1000 hrs, 100 nm, etc)            
+            temp = line.split()
+            self.sfactor = int(temp[0])         # Statistics base (like 1000 hrs, 100 nm, etc)            
             
-            ##############################################    # Number of load cases
+            ##############################################    
             line = file.readline()
             temp = line.split() 
-            self.nsegs = int(temp[0])         
+            self.nsegs = int(temp[0])           # Number of segments
 
-            for i in range(self.ncases):
-                line = file.readline()
-                temp = line.split()
+            line = file.readline()
+            temp = line.split()
+            for i in range(self.nsegs):         # Segments Ids
                 self.segs.append(float(temp[i]))
-                self.seg_time.append(times[temp[i]])
+                self.seg_time.append(times[int(temp[i])])
+                
+            line = file.readline()
+            temp = line.split()     
+            for i in range(self.nsegs):          # Load factors Limitations
+                self.limits.append(0)            
+           
             ##############################################    # Distribution based on time or input
             line = file.readline()
             temp = line.split() 
             self.idists = int(temp[0])        
            
             if self.idists == 0:
-                for i in range(len(self.segs)):
-                    self.dists.append(float(self.seg_time[i]) / self.airborne_time)
+                for i in range(self.nsegs):
+                    self.dists.append(float(self.seg_time[i]) / float(self.airborne_time))
             else:
                 line = file.readline()
                 temp = line.split()                  
-                for i in range(len(self.segs)):
+                for i in range(self.nsegs):
                     self.dists.append(temp[i])
-            #############################################    # Limitation (e.g. flapped segments)
-            line = file.readline()
-            temp = line.split() 
-            self.ilimit = int(temp[0])       
-           
-            if self.ilimit == 0:
-                for i in range(len(self.segs)):
-                    self.limits.append(0)
-            else:
-                line = file.readline()
-                temp = line.split()                  
-                for i in range(len(self.segs)):
-                    self.limits.append(temp[i])
+
             ############################################   # Statistics
             line = file.readline()
             temp = line.split() 
@@ -83,20 +78,23 @@ class Flight_statistics:
             for i in range(self.nps):
                 line = file.readline()
                 temp = line.split()
-                self.statistics[i, 0] = float[temp[0]] * self.max
-                self.statistics[i, 1] = float[temp[1]] * float(multiplier)
-                self.statistics[i, 2] = math.log10(float[temp[1]] * float(multiplier))
-                self.statistics[i, 3] = float[temp[2]] * self.max
-                self.statistics[i, 4] = float[temp[3]] * float(multiplier)
-                self.statistics[i, 5] = math.log10(float[temp[3]] * float(multiplier))                 
+                self.statistics[i, 0] = float(self.meanlf) + float(temp[0]) * float(self.inclf)
+                self.statistics[i, 1] = float(temp[1]) * float(self.sfactor) * float(multiplier)
+                self.statistics[i, 2] = math.log10(float(temp[1]) * float(multiplier))
+                self.statistics[i, 3] = float(self.meanlf) + float(temp[2]) * float(self.inclf)
+                self.statistics[i, 4] = float(temp[3]) * float(self.sfactor) * float(multiplier)
+                self.statistics[i, 5] = math.log10(float(self.sfactor) * float(temp[3]) * float(multiplier))                 
 
 
     def get_discrete_load_levels(self, exc):
         
         # Input Exceedances in life per load level
         for i in range(10):
-            self.levels[i, 0] = np.interp(math.log10(exc[i]), self.statistics[:, 2], self.statistics[:, 0])
-            self.levels[i, 1] = np.interp(math.log10(exc[i]), self.statistics[:, 5], self.statistics[:, 0])
+            f1 = interp1d(self.statistics[:, 2], self.statistics[:, 0], fill_value='extrapolate')
+            f2 = interp1d(self.statistics[:, 5], self.statistics[:, 3], fill_value='extrapolate')
+            self.levels[i, 0] = f1(math.log10(exc[i]))
+            self.levels[i, 1] = f2(math.log10(exc[i]))
+
                     
 #
 #  Taxi Statistic
@@ -128,7 +126,7 @@ class Twist:
         
         
     def read_cases(self, filepath):
-        with open(self.filepath, 'r') as file:
+        with open(filepath, 'r') as file:
             line = file.readline()
             temp = line.split() 
             self.nlvls = int(temp[0])

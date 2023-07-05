@@ -1,11 +1,12 @@
-9
+10
 1   0   5   Taxi-out
 0   1   0   Take_off
-1   2   3   Climb_up_to_5000_ft
-1   3   2   Climb_up_to_10000_ft
-1   4   65  Cruise_10000_ft
-1   5   2   Descent_up_to_5000_ft
-1   6   2   Descent_up_to_500_ft
-0   7   0   Flap_Actuation
-1   8   1   Final_Approach
-1   9   5   Taxi-in
+1   2   1   Initial Climb
+1   3   2   Climb_up_to_5000_ft
+1   4   2   Climb_up_to_10000_ft
+1   5   65  Cruise_10000_ft
+1   6   2   Descent_up_to_5000_ft
+1   7   2   Descent_up_to_500_ft
+0   8   0   Flap_Actuation
+1   9   1   Final_Approach
+1   10  5   Taxi-in

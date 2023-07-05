@@ -1,12 +1,11 @@
-2.93        Limit Maneuver Load Factor
-1    1      0|1: Time[hrs]|Range[nm]  -  Base
-6           Segments
-2  3  4  5  6  8
-1           Distribution based on 0: Time  1: Input
-0.2 0.2 0.1 0.15 0.15 0.2     
-1           Limitations per segment - 0: No  1: Yes
-1  1  1  1  1  0.683
-19          Maneuver LF Exceedances per NM
+1.93    1.00                                        Limit Maneuvering Load Factor at Maximum Gross Weight
+1                                                   Multiplying factor adopted in the statistics to expand it to the aircraft life (Like a statistics normalized per 1000 flights would need to be multiplied by the number of flights divided by 1000)
+7                                                   Segments
+2     3     4     5     6     7     9               Segments Ids
+0.683 1.00  1.00  1.00  1.00  1.00  0.683           Gust load factors limitations per segment
+1                                                   Distribution based on 0: Segments Time   1: Input data     
+0.20  0.20  0.15  0.05   0.10  0.10  0.20           Distribution per segment  
+20          Maneuver LF Exceedances per NM
 0.100        6.8949E-02       -0.100       5.9106E-02
 0.150        2.4512E-02       -0.150       1.4952E-02
 0.200        9.6506E-03       -0.200       3.4774E-03
@@ -26,4 +25,4 @@
 0.900        3.3641E-07       -0.900       2.3234E-10
 0.950        1.6961E-07       -0.950       6.7054E-11
 1.000        1.6961E-07       -1.000       1.8262E-11
-
+1.000        1.0000E-10       -1.000       1.0000E-10

@@ -1,5 +1,5 @@
 #
-class Profile:
+class Flight_Profile:
     def __init__(self, filepath):
         self.nsegs = 0
         self.stype = []      # 0: Events    1: Segments
@@ -11,7 +11,7 @@ class Profile:
         
     def read_profile(self, filepath):
         
-        with open(self.filepath, 'r') as file:
+        with open(filepath, 'r') as file:
             line = file.readline()
             temp = line.split()
             self.nsegs = int(temp[0])

@@ -1,23 +1,17 @@
 # -*- coding: utf-8 -*-
 import os
 from component import Component
+from flt_profile import Flight_Profile
 
 
 class Config:
     def __init__(self):
-        self.flight_names = []
-        self.flight_labels = []
-        self.flight_filenames = []
-        self.flight_occ = []
-        self.life_cycles = []
+
+        # flt_distribution.txt
         self.block = []
+        
+        # ac_data.txt
         self.nflights = 0
-        self.resources_dir = None
-        self.config_dir = None
-        self.flights_dir = None
-        self.statistics_dir = None
-        self.twist_dir = None
-        self.flt_path = []
         self.flight_types = 0
         self.flight_time = 0
         self.airborne_time = 0        
@@ -25,8 +19,23 @@ class Config:
         self.nblocks = 0
         self.flts_per_block = 0
         self.logs = 0
-        self.component = Component()
         
+        
+        # directories
+        self.resources_dir = None
+        self.config_dir = None
+        self.flights_dir = None
+        self.statistics_dir = None
+        self.twist_dir = None
+        
+        # flt_occurrence.txt
+        self.flight_labels = []
+        self.flight_filenames = []
+        self.flight_occ = []
+        self.flt_path = []
+        
+        self.profile = None
+        self.component = Component()
         self.set_config()
         
 
@@ -39,7 +48,8 @@ class Config:
         self.config_dir = os.path.join(self.resources_dir, './config')
         self.flights_dir = os.path.join(self.resources_dir, './flights')
         self.statistics_dir = os.path.join(self.resources_dir, './statistics')
-        self.twist_dir = os.path.join(self.resources_dir, './twist')       
+        self.twist_dir = os.path.join(self.resources_dir, './twist')  
+
         
         print(self.main_dir)
         print(self.resources_dir)
@@ -54,6 +64,7 @@ class Config:
         flt_occ_path = os.path.join(self.config_dir, 'flt_occurrence.txt')
         config_path = os.path.join(self.config_dir, 'ac_data.txt')
         flt_disp_path = os.path.join(self.config_dir, 'flt_distribution.txt')
+        flt_profile_path = os.path.join(self.config_dir, 'flt_profile.txt')
         
 
         # Reading config file
@@ -72,7 +83,7 @@ class Config:
 
             line = file.readline()
             temp = line.split()
-            self.flight_range = int(temp[0])   # Flight range in nm
+            self.flight_range = float(temp[0])   # Flight range in nm
             
 
             line = file.readline()
@@ -114,7 +125,7 @@ class Config:
                 self.block.append(temp[0])
 
                 
-                
+        self.profile = Flight_Profile(flt_profile_path)
 
             
 
