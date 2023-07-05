@@ -100,10 +100,54 @@ class Flight_statistics:
 #  Taxi Statistic
 #   
 class Taxi_statistics:
-    def __init__(self, filepath):
-        pass
-    
-    
+    def __init__(self, filepath, seg_times, multiplier):
+        self.sfactor = 0
+        self.nps = 0
+        self.nsegs = 0
+        self.segs = []
+        self.times = []
+        self.meanlf = 0
+        self.statistics = None
+        self.levels = np.empty((10,2))
+        
+        self.read_cases(filepath, seg_times, multiplier)
+
+    def read_cases(self, filepath, times, multiplier):
+        
+        with open(filepath, 'r') as file:
+            line = file.readline()
+            temp = line.split()
+            self.sfactor = float(temp[0])
+            
+            line = file.readline()
+            temp = line.split()
+            self.meanlf = float(temp[0])            
+
+            line = file.readline()
+            temp = line.split()
+            self.nsegs = int(temp[0])
+
+            line = file.readline()
+            temp = line.split()
+            for i in range(self.nsegs):
+                self.segs.append(int(temp[0]))
+            
+            line = file.readline()
+            temp = line.split()
+            self.nps = int(temp[0])            
+            self.statistics = np.empty((self.nps, 6))
+            
+            for i in range(self.nps):
+                line = file.readline()
+                temp = line.split()
+                self.statistics[i, 0] = float(self.meanlf) + float(temp[1]) * float(self.inclf)
+                self.statistics[i, 1] = float(temp[0]) * float(self.sfactor) * float(multiplier)
+                self.statistics[i, 2] = math.log10(float(temp[0]) * float(multiplier))
+                self.statistics[i, 3] = float(self.meanlf) + float(temp[3]) * float(self.inclf)
+                self.statistics[i, 4] = float(temp[2]) * float(self.sfactor) * float(multiplier)
+                self.statistics[i, 5] = math.log10(float(self.sfactor) * float(temp[2]) * float(multiplier))                 
+                
+               
 #
 #  Landing Statistic
 #       

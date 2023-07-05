@@ -112,3 +112,8 @@ class Flight:
             th.append(self.th[2 * i - 1], int(sel))
             
         return th
+    
+    
+    
+    def factor_to_load(self, filepath, sel):
+        pass
