@@ -27,6 +27,7 @@ class Config:
         self.flights_dir = None
         self.statistics_dir = None
         self.twist_dir = None
+        self.tfpath = None
         
         # flt_occurrence.txt
         self.flight_labels = []
@@ -48,7 +49,8 @@ class Config:
         self.config_dir = os.path.join(self.resources_dir, './config')
         self.flights_dir = os.path.join(self.resources_dir, './flights')
         self.statistics_dir = os.path.join(self.resources_dir, './statistics')
-        self.twist_dir = os.path.join(self.resources_dir, './twist')  
+        self.twist_dir = os.path.join(self.resources_dir, './twist') 
+        self.tfpath = os.path.join(self.config_dir, 'transfer_function.txt')
 
         
         print(self.main_dir)

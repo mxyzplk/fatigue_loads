@@ -1,6 +1,9 @@
 import rainflow
 import matplotlib.pyplot as plt
 import os
+from tf import Tf
+
+
 class Th:
     def __init__(self, label, time_history):
         self.time_history = []
@@ -103,6 +106,6 @@ class Th:
 
         filepath = os.path.join(folder_name, 'amplitude_exc_' + str(self.label) + '.png')
 
-        fig.savefig(filepath, dpi=600, bbox_inches='tight')
+        fig.savefig(filepath, dpi=600, bbox_inches='tight', pad_inches=0.1)
 
 

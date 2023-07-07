@@ -2,6 +2,8 @@ import os
 import stdata
 import config
 import math
+import flights
+import signal_analysis
 
 
 #  Test dir
@@ -14,6 +16,7 @@ twist_dir = os.path.join(res_dir, './twist')
 os.makedirs(test_dir, exist_ok=True)
 os.makedirs(stat_dir, exist_ok=True)
 os.makedirs(twist_dir, exist_ok=True)
+
 
 # Test Aircraft Data
 ac_data_obj = config.Config()
@@ -36,6 +39,14 @@ file.write('Range: {:10.3f}\n'.format(ac_data_obj.flight_range))
 
 
 file.close()
+
+# Test write th with tf
+flights_obj = flights.Flights(ac_data_obj.flt_path)
+flight_obj_th_tf = flights_obj.flight_to_th(ac_data_obj.flts_per_block, ac_data_obj.block, ac_data_obj.logs, 0, 1, ac_data_obj.tfpath)
+flight_th = signal_analysis.Th("Wing Root Bending Moment", flight_obj_th_tf)
+
+
+
 
 # Test Flight Statistics - Gust
 
@@ -101,6 +112,10 @@ for i in range(10):
         
 file.close()
 
+gust_graph_path = os.path.join(test_dir, 'test_gust.png')
+
+gust_st_obj.print_discrete_load_levels_graph(gust_graph_path, "Gust")
+
 # Test Flight Statistics - Maneuver
 
 maneuver_st_path = os.path.join(stat_dir, 'ac23-13a_maneuver.txt')
@@ -164,5 +179,9 @@ for i in range(10):
 
         
 file.close()
+
+maneuver_graph_path = os.path.join(test_dir, 'test_maneuver.png')
+
+maneuver_st_obj.print_discrete_load_levels_graph(maneuver_graph_path, "Maneuver")
 
 

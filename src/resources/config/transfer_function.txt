@@ -1,4 +1,10 @@
-gust         1     LF    1 
-maneuver
-taxi
-landing
+4                                  Transfer Functions
+1                                  Stations
+10000004
+141439      -12194
+10000005
+141439      -12194
+10000003
+-48552       0
+10000010
+-13995       0

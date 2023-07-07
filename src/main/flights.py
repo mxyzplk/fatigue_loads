@@ -1,11 +1,17 @@
 import numpy as np
 import os
+import tf
 
 class Flights:
     def __init__(self, filepaths):
+        
+        # Array containing the 10 Flights
         self.flight_data = [Flight(filepaths[i]) for i in range(len(filepaths))]
         
-        
+    #
+    # Function which runs through each flight in the 4000 flights block and write the data
+    # for fatigue and damage tolerance analysis    
+    #
     def write_load_cycles(self, flts_per_block, block, log, sel, comp, label, load):
         
         folder_name = "results"
@@ -18,19 +24,27 @@ class Flights:
             if int(log) == 1:
                 print('Printing Flight #' + str(i) + " Type: " + str(block[i]))
             
-            self.flight_data[int(block[i])].write_flights(filepath, sel)   
+            self.flight_data[int(block[i]) - 1].write_flights(filepath, sel)   
             
 
-    def flight_to_th(self, flts_per_block, block, log, sel):
+    #
+    #  This function runs through the 4000 flights in a block and concatenates the time histories
+    #  which can be used in a cycles counting algorythm
+    #
+    def flight_to_th(self, flts_per_block, block, log, sel, itf, tfpath):
         
         th = []
+
         
         for i in range(int(flts_per_block)):
             
             if int(log) == 1:
-                print(' Setting Time history - Flight #' + str(i) + " Type: " + str(block[i]))
+                print(' Setting Time history - Flight #' + str(i + 1) + " Type: " + str(block[i]))
             
-            self.flight_data[int(block[i])].write_th(th, sel)       
+            if itf == 0:
+                self.flight_data[int(block[i]) - 1].write_th(th, sel)
+            else:
+                self.flight_data[int(block[i]) - 1].write_th_tf(th, sel, tfpath)
             
         return th
 
@@ -52,8 +66,10 @@ class Flight:
         self.th = None
         
         self.read_flight()
-
-
+        
+    #
+    #  Function which reads a Flight[1-10].txt file
+    #
     def read_flight(self):
         i = 0
         with open(self.filepath, 'r') as file:
@@ -69,7 +85,7 @@ class Flight:
                         self.pars.append(temp[3+j])
                     
                     self.load = np.empty((self.np, self.npars, 2)) # lines, parameters, maximum and minimum loads
-                    self.cases = np.chararray((self.np, self.npars, 2)) # lines, parameters, maximum and minimum loads
+                    self.cases = np.empty((self.np, self.npars, 2), dtype='object') # lines, parameters, maximum and minimum loads
                     self.th = np.empty((self.np * 2, self.npars))
                     
                 if i > 1:
@@ -82,12 +98,13 @@ class Flight:
                     
                     # loads
                     for j in range(self.npars):
+                
                         self.load[i - 2, j, 0] = float(temp[3 + 4 * j])
                         self.load[i - 2, j, 1] = float(temp[5 + 4 * j])
                         self.cases[i - 2, j, 0] = temp[4 + 4 * j]
                         self.cases[i - 2, j, 1] = temp[6 + 4 * j]
                         self.th[2 * (i - 2), j] = float(temp[3 + 4 * j])
-                        self.th[2 * (i - 2) - 1, j] = float(temp[5 + 4 * j])                        
+                        self.th[2 * (i - 2) + 1, j] = float(temp[5 + 4 * j])                        
 
                     
     
@@ -108,12 +125,24 @@ class Flight:
     def write_th(self, th, sel):
         
         for i in range(int(self.np)):
-            th.append(self.th[2 * i], int(sel))
-            th.append(self.th[2 * i - 1], int(sel))
+            th.append(self.th[2 * i, int(sel)])
+            th.append(self.th[2 * i + 1, int(sel)])
             
         return th
     
     
+    # Function that writes the time history from each flight into a time history comprising all blocks
+    # using the transfer functions
+    def write_th_tf(self, th, sel, tfpath):
+        
+        tf_list = tf.Tf(tfpath)
+        
+        for i in range(int(self.np)):   # Loop for each line in the flight file
+            tfval1 = tf_list.eval_tf(self.th[2 * i, int(sel)], self.cases[i, sel, 0], 0)
+            tfval2 = tf_list.eval_tf(self.th[2 * i + 1, int(sel)], self.cases[i, sel, 1], 0)
+            th.append(tfval1)
+            th.append(tfval2)
+            
+        return th    
+
     
-    def factor_to_load(self, filepath, sel):
-        pass

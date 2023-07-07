@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 
 #
@@ -94,13 +95,34 @@ class Flight_statistics:
             f2 = interp1d(self.statistics[:, 5], self.statistics[:, 3], fill_value='extrapolate')
             self.levels[i, 0] = f1(math.log10(exc[i]))
             self.levels[i, 1] = f2(math.log10(exc[i]))
+            
+            
+    def print_discrete_load_levels_graph(self, filepath, label):
+            
+        fig, ax = plt.subplots()
+        ax.plot(self.statistics[:, 1], self.statistics[:, 0], color='black')
+        ax.plot(self.statistics[:, 4], self.statistics[:, 3], color='black')
 
-                    
+        ax.plot(self.discrete.exc, self.levels[:, 0], linestyle='None', marker='o', markersize=5, color='red', label='Load Levels')
+        ax.plot(self.discrete.exc, self.levels[:, 1], linestyle='None', marker='o', markersize=5, color='red')
+
+        ax.legend(loc='lower right')
+        ax.set_xscale('log')
+        ax.set_xlabel('Exceedances')
+        ax.set_ylabel('Load Factor - ' + label)
+        ax.set_title('Load Levels Statistics - ' + label)
+        ax.grid(color='0.8', linestyle='dashed', which='both', linewidth=0.5)
+        plt.xlim(left=1)
+        plt.figure(figsize=(10, 6))
+
+        fig.savefig(filepath, dpi=600, bbox_inches='tight', pad_inches=0.1)
+        
+                  
 #
 #  Taxi Statistic
 #   
 class Taxi_statistics:
-    def __init__(self, filepath, seg_times, multiplier):
+    def __init__(self, filepath, seg_times, multiplier, twistpath, nblocks):
         self.sfactor = 0
         self.nps = 0
         self.nsegs = 0
@@ -111,6 +133,8 @@ class Taxi_statistics:
         self.levels = np.empty((10,2))
         
         self.read_cases(filepath, seg_times, multiplier)
+        self.discrete = Twist(twistpath, nblocks)
+        self.get_discrete_load_levels(self.discrete.exc)
 
     def read_cases(self, filepath, times, multiplier):
         
@@ -146,8 +170,37 @@ class Taxi_statistics:
                 self.statistics[i, 3] = float(self.meanlf) + float(temp[3]) * float(self.inclf)
                 self.statistics[i, 4] = float(temp[2]) * float(self.sfactor) * float(multiplier)
                 self.statistics[i, 5] = math.log10(float(self.sfactor) * float(temp[2]) * float(multiplier))                 
+
                 
-               
+    def get_discrete_load_levels(self, exc):               
+        # Input Exceedances in life per load level
+        for i in range(10):
+            f1 = interp1d(self.statistics[:, 2], self.statistics[:, 0], fill_value='extrapolate')
+            f2 = interp1d(self.statistics[:, 5], self.statistics[:, 3], fill_value='extrapolate')
+            self.levels[i, 0] = f1(math.log10(exc[i]))
+            self.levels[i, 1] = f2(math.log10(exc[i]))
+
+
+    def print_discrete_load_levels_graph(self, filepath, label):
+            
+        fig, ax = plt.subplots()
+        ax.plot(self.statistics[:, 1], self.statistics[:, 0], color='black')
+        ax.plot(self.statistics[:, 4], self.statistics[:, 3], color='black')
+
+        ax.plot(self.discrete.exc, self.levels[:, 0], linestyle='None', marker='o', markersize=5, color='red', label='Load Levels')
+        ax.plot(self.discrete.exc, self.levels[:, 1], linestyle='None', marker='o', markersize=5, color='red')
+
+        ax.legend(loc='lower right')
+        ax.set_xscale('log')
+        ax.set_xlabel('Exceedances')
+        ax.set_ylabel('Load Factor - ' + label)
+        ax.set_title('Load Levels Statistics - ' + label)
+        ax.grid(color='0.8', linestyle='dashed', which='both', linewidth=0.5)
+        plt.xlim(left=1)
+        plt.figure(figsize=(10, 6))
+
+        fig.savefig(filepath, dpi=600, bbox_inches='tight', pad_inches=0.1)
+
 #
 #  Landing Statistic
 #       
